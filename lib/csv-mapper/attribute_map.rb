@@ -8,6 +8,10 @@ module CsvMapper
     def initialize(name, index, map_context)
       @name, @index, @map_context = name, index, map_context
     end
+
+    def to_s
+      "#{@index}: #{@name}"
+    end
   
     # Set the index that this map is targeting.
     #
@@ -51,5 +55,5 @@ module CsvMapper
         @transformer.call(csv_row, @index)
       end
     end
-end
+  end
 end

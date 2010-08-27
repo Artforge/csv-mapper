@@ -17,6 +17,7 @@ module CsvMapper
       @csv_data = csv_data
       @before_filters = []
       @after_filters = []
+      @named_columns = false
       @parser_options = {}
       @start_at_row = 0
       @stop_at_row = Infinity
@@ -69,6 +70,12 @@ module CsvMapper
       @parser_options.merge :col_sep => @delimited_by
     end
 
+    # Default csv_mapper behaviour is to use the ordinal position of a mapped attribute.
+    # If you prefer to look for a column with the name of the attribute, use this method.
+    def named_columns
+      @named_columns = true
+    end
+
     # Convenience method to 'move' the cursor skipping the current index.
     def _SKIP_
       self.move_cursor
@@ -115,23 +122,6 @@ module CsvMapper
       attr_mapping
     end
 
-    # Add multiple attributes to this map.  Use strings or alias hashes.
-    # e.g. add_attributes({'Last name' => 'surname', 'First name' => 'forename'}, 'age', 'shoe_size')
-    def add_attributes_by_name(*attribute_names_or_alias_hash)
-      attribute_names_or_alias_hash.each_with_index do |name_or_hash, index|
-        case name_or_hash
-          when Hash
-            name_or_hash.each_pair do |original_name, new_name|
-               add_attribute new_name, headers_to_indices.fetch(original_name)
-            end
-          when String
-            add_attribute attributize_field_name(name_or_hash), headers_to_indices.fetch(name_or_hash)
-          else
-            raise ArgumentError, "Argument at index #{index} was not a String or a Hash"
-        end
-      end
-    end
-
     # The current cursor location
     def cursor  # :nodoc:
       @cursor ||= 0
@@ -165,6 +155,17 @@ module CsvMapper
     # An optional first argument is used to move this maps cursor position and as the index of the
     # new AttributeMap
     def method_missing(name, *args) # :nodoc:
+      existing_map = self.mapped_attributes.find {|attr| attr.name == name}
+      return existing_map if existing_map
+
+      # Effectively add an alias when we see new_field('With/Aliased/Name')
+      if args[0].is_a? String
+        return add_attribute(name, headers_to_indices.fetch(args[0].downcase)) 
+      end
+      
+      if @named_columns
+        return add_attribute(name, headers_to_indices.fetch(name.to_s))
+      end
 
       if index = args[0]
         self.move_cursor(index - self.cursor)
@@ -192,7 +193,7 @@ module CsvMapper
     def headers_to_indices
       return @h_to_i if @h_to_i
       @h_to_i = {}
-      iterate_headers { |name, index| @h_to_i[name.strip] = index if name }
+      iterate_headers { |name, index| @h_to_i[name.strip.downcase] = index if name }
       @h_to_i
     end
 
