@@ -130,4 +130,8 @@ describe CsvMapper::RowMap do
     @row_map.first_name.map(:transform)
     @row_map.parse(@csv_row).first_name.should == :transform_success
   end
+
+  it "should not allow non-String/non-Hash input to add_attributes" do
+    lambda { @row_map.add_attributes_by_name(1) }.should raise_error(ArgumentError)
+  end
 end

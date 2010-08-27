@@ -143,6 +143,43 @@ describe CsvMapper do
       results[1].number_of_years_old.should == '26'
     end
 
+    describe "Adding only certain attributes by name or alias" do
+      before :all do
+        @results = CsvMapper.import(File.dirname(__FILE__) + '/test_with_empty_column_names.csv') do
+          add_attributes_by_name({'Last Name' => 'surname'}, 'Age')
+        end
+        puts @results[1]
+      end
+
+      it "should have Last name aliased as surname" do
+        @results[1].surname.should == 'Doe'
+      end
+
+      it "should have Age as-is" do
+        @results[1].age.should == "26"
+      end
+
+      it "should not have First Name at all" do
+        lambda { @results[1].first_name }.should raise_error(NoMethodError)
+      end
+
+      it "should raise IndexError when adding non-existent fields" do
+        lambda {
+          @results = CsvMapper.import(File.dirname(__FILE__) + '/test_with_empty_column_names.csv') do
+            add_attributes_by_name('doesnt_exist')
+          end
+        }.should raise_error(IndexError)
+      end
+
+      it "should raise IndexError when adding non-existent aliases" do
+        lambda {
+          @results = CsvMapper.import(File.dirname(__FILE__) + '/test_with_empty_column_names.csv') do
+            add_attributes_by_name({'doesnt_exist' => 'phooey'})
+          end
+        }.should raise_error(IndexError)
+      end
+    end
+
     it "should be able to assign default column names when column names are null" do
       results = CsvMapper.import(File.dirname(__FILE__) + '/test_with_empty_column_names.csv') do
         read_attributes_from_file

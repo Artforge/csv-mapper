@@ -49,17 +49,14 @@ module CsvMapper
     #
     # i.e. read_attributes_from_file('files+' => 'files_plus', 'files-' => 'files_minus)
     def read_attributes_from_file aliases = {}
-      attributes = FasterCSV.new(@csv_data, @parser_options).readline
-      @start_at_row = [ @start_at_row, 1 ].max
-      @csv_data.rewind
       unnamed_number = 1
-      attributes.each_with_index do |name, index|
+      iterate_headers do |name, index|
         if name.nil?
           name = "_field_#{unnamed_number}"
-          unnamed_number += 1                  
+          unnamed_number += 1
         end
         name.strip!
-        use_name = aliases[name] || name.gsub(/\s+/, '_').gsub(/[\W]+/, '').downcase
+        use_name = aliases[name] || attributize_field_name(name)
         add_attribute use_name, index
       end
     end
@@ -118,6 +115,23 @@ module CsvMapper
       attr_mapping
     end
 
+    # Add multiple attributes to this map.  Use strings or alias hashes.
+    # e.g. add_attributes({'Last name' => 'surname', 'First name' => 'forename'}, 'age', 'shoe_size')
+    def add_attributes_by_name(*attribute_names_or_alias_hash)
+      attribute_names_or_alias_hash.each_with_index do |name_or_hash, index|
+        case name_or_hash
+          when Hash
+            name_or_hash.each_pair do |original_name, new_name|
+               add_attribute new_name, headers_to_indices.fetch(original_name)
+            end
+          when String
+            add_attribute attributize_field_name(name_or_hash), headers_to_indices.fetch(name_or_hash)
+          else
+            raise ArgumentError, "Argument at index #{index} was not a String or a Hash"
+        end
+      end
+    end
+
     # The current cursor location
     def cursor  # :nodoc:
       @cursor ||= 0
@@ -168,6 +182,20 @@ module CsvMapper
       end).flatten!
     end
 
+    def iterate_headers
+      attributes = FasterCSV.new(@csv_data, @parser_options).readline
+      @start_at_row = [ @start_at_row, 1 ].max
+      @csv_data.rewind
+      attributes.each_with_index { |name, index| yield name, index }
+    end
+
+    def headers_to_indices
+      return @h_to_i if @h_to_i
+      @h_to_i = {}
+      iterate_headers { |name, index| @h_to_i[name.strip] = index if name }
+      @h_to_i
+    end
+
     def map_to_class # :nodoc:
       unless @map_to_klass
         attrs = mapped_attributes.collect {|attr_map| attr_map.name}
@@ -179,6 +207,10 @@ module CsvMapper
 
     def cursor=(value) # :nodoc:
       @cursor=value
+    end
+
+    def attributize_field_name(name)
+      name.gsub(/\s+/, '_').gsub(/[\W]+/, '').downcase
     end
   end
 end
