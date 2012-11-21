@@ -1,4 +1,6 @@
 pkg/*
 doc/*
+rdoc/
 .idea/*
 *.gemspec
+.rvmrc

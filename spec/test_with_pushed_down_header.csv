@@ -1,0 +1,8 @@
+"Some data"
+
+This is a test file whose header line starts at the 0-indexed 4th row and the data starts at the 5th.  I know. It's not a CSV as such, but they exist...
+
+First Name, Last Name, Age,,,
+John,Doe,27,,,
+Jane,Doe,26,unnamed_value,,
+Bat,Man,52,,,

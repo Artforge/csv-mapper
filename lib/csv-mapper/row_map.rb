@@ -184,8 +184,14 @@ module CsvMapper
     end
 
     def iterate_headers
-      attributes = FasterCSV.new(@csv_data, @parser_options).readline
       @start_at_row = [ @start_at_row, 1 ].max
+
+      csv = FasterCSV.new(@csv_data, @parser_options)
+
+      # Header is for now assumed to be one row above data
+      (@start_at_row - 1).times { csv.readline } if @start_at_row > 1
+
+      attributes = csv.readline
       @csv_data.rewind
       attributes.each_with_index { |name, index| yield name, index }
     end
