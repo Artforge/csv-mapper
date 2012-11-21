@@ -9,6 +9,7 @@ module CsvMapper
     instance_methods.each { |m| undef_method m unless m =~ /^__||instance_eval/ }
 
     Infinity = 1.0/0
+    attr_reader :context
     attr_reader :mapped_attributes
 
     # Create a new instance with access to an evaluation context 

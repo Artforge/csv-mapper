@@ -15,10 +15,16 @@ describe CsvMapper::RowMap do
       row[0] = :changed_name
     end
   end
-  
+
+  let(:test_context) { TestMapContext.new }
+
   before(:each) do
-    @row_map = CsvMapper::RowMap.new(TestMapContext.new)
+    @row_map = CsvMapper::RowMap.new(test_context)
     @csv_row = ['first_name', 'last_name']
+  end
+
+  it "should provide access to the context" do
+    @row_map.context.should == test_context
   end
 
   it "should parse a CSV row" do
