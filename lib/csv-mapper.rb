@@ -46,7 +46,8 @@ require 'rubygems'
 # 
 # ===== The Basics
 # * +map_to+ - Override the default Struct target. Accepts a class and an optional hash of default attribute names and values.
-# * +start_at_row+ - Specify what row to begin parsing at.  Use this to skip headers.
+# * +named_columns+ - Enables named columns mode. Headers are required. See "Named Column Mappings" below.
+# * +start_at_row+ - Specify what row to begin parsing at.  Use this to skip headers. When +named_columns+ is used, headers are assumed to be one line above this row.
 # * +before_row+ - Accepts an Array of method name symbols or lambdas to be invoked before parsing each row.
 # * +after_row+ - Accepts an Array of method name symbols or lambdas to be invoked after parsing each row.
 # * +delimited_by+ - Accepts a character to be used to delimit columns. Use this to specify pipe-delimited files.
@@ -70,6 +71,13 @@ require 'rubygems'
 #   bar.map :clean_bar  # maps the result of the clean_bar method to 'bar'. clean_bar must accept the row as a parameter.
 # Attribute mapping declarations and "modifiers" may be chained
 #   foo.at(4).map :some_transform
+#
+# === Named Columns Mappings
+# When +named_columns+ is called, column names will be read from one row above +start_at_row+.  This allows
+# you to map cell properties to named columns in the CSV.  For example:
+#   surname('Last Name') # Where 'Last Name' is the name of a column in the CSV
+#
+# Columns which go unmentioned will be omitted from the results.
 #
 # === Create Reusable Mappings
 # The +import+ method accepts an instance of RowMap as an optional mapping parameter.  

@@ -35,6 +35,22 @@ The following example will import a CSV file to an Array of Struct[http://www.ru
   results.first.last_name   # Doe
   results.first.age         # 27
 
+==== Named Columns Example
+Columns which aren't mentioned won't appear in the results.
+
+  # Don't mention first name
+  results = CsvMapper.import('/path/to/file_with_header_row.csv') do
+    named_columns
+
+    surname('last_name')
+    age
+  end
+
+  results.first.surname     # Doe
+  results.first.age         # 27
+  results.first.first_name  # nil
+  results.first.last_name   # nil
+
 ==== Import to ActiveRecord Example
 Although CsvMapper has no dependency on ActiveRecord; it's easy to import a CSV file to ActiveRecord models and save them.
 
