@@ -4,12 +4,12 @@ require 'rake'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
-    gem.name = "rgarner-csv-mapper"
-    gem.summary = %Q{rgarner-CsvMapper is a fork of a small library intended to simplify the common steps involved with importing CSV files to a usable form in Ruby. It has support for null column names. When this is merged, this gem will be removed.}
+    gem.name = "artforge-csv-mapper"
+    gem.summary = %Q{artforge-CsvMapper is a fork of a small library intended to simplify the common steps involved with importing CSV files to a usable form in Ruby. It has support for null column names. When this is merged, this gem will be removed.}
     gem.description = %Q{CSV Mapper makes it easy to import data from CSV files directly to a collection of any type of Ruby object. The simplest way to create mappings is declare the names of the attributes in the order corresponding to the CSV file column order.}
-    gem.email = "rgarner@zephyros-systems.co.uk"
-    gem.homepage = "http://github.com/rgarner/csv-mapper"
-    gem.authors = ["Luke Pillow", "Russell Garner"]
+    gem.email = "adam@artforge.com"
+    gem.homepage = "http://github.com/Artforge/csv-mapper"
+    gem.authors = ["Luke Pillow", "Russell Garner", "Adam Singer"]
     gem.add_development_dependency "rspec", ">= 2.0.0"
     gem.add_dependency "fastercsv"  
     gem.extra_rdoc_files << "History.txt"
@@ -41,7 +41,7 @@ RDoc::Task.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
   rdoc.rdoc_dir = 'rdoc'
-  rdoc.title = "rgarner-csv-mapper #{version}"
+  rdoc.title = "artforge-csv-mapper #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
